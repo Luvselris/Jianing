@@ -79,7 +79,7 @@
       z-index: 2;
     }
 
-    /* แถบด้านบนสีเขียวมิ้นต์ทั้งหมด */
+    /* แถบด้านบนสีเขียวมิ้นต์ */
     .top-navbar {
       background: var(--mint-bg);
       border: 1.5px solid var(--mint-border);
@@ -379,7 +379,7 @@
       box-shadow: 0 4px 14px rgba(29, 110, 93, 0.15);
     }
 
-    /* Payment Card & Grid Gallery */
+    /* Payment Card & Full-Scale Posts */
     .payment-explain-box {
       background: #ffffff;
       border: 1.5px solid var(--border-pink);
@@ -391,85 +391,33 @@
       color: var(--text-dark);
       white-space: pre-line;
       text-align: center;
-      margin-bottom: 18px;
-    }
-
-    .payment-grid-gallery {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
       margin-bottom: 20px;
     }
 
-    .payment-grid-item {
-      position: relative;
-      aspect-ratio: 1;
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1.5px solid var(--border-pink);
+    /* โพสต์ภาพแนวตั้งขนาดจริง คมชัดเต็มตา ไม่ย่อส่วน ไม่ตัดขอบ */
+    .payment-posts-container {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .payment-post-card {
       background: #ffffff;
-      box-shadow: 0 6px 18px rgba(251, 111, 146, 0.15);
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    .payment-grid-item:active {
-      transform: scale(0.97);
-    }
-
-    .payment-grid-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    /* Lightbox Modal ขยายเต็มจอ คมชัดระดับ 100% ไม่ลดทอน */
-    .img-lightbox-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.94);
-      backdrop-filter: blur(10px);
-      z-index: 99999999;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
+      border: 1.5px solid var(--border-pink);
+      border-radius: 24px;
       overflow: hidden;
-      touch-action: manipulation;
-    }
-    .img-lightbox-modal.active {
-      display: flex;
+      box-shadow: var(--shadow-soft);
+      padding: 8px;
     }
 
-    .img-lightbox-modal img {
-      width: auto;
+    .payment-post-card img {
+      width: 100%;
       height: auto;
-      max-width: 98vw;
-      max-height: 92vh;
-      object-fit: contain;
-      border-radius: 14px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+      display: block;
+      border-radius: 18px;
       image-rendering: -webkit-optimize-contrast;
-      user-select: none;
-      -webkit-user-drag: none;
-    }
-
-    .lightbox-close {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      background: rgba(255, 255, 255, 0.35);
-      border: none;
-      color: #fff;
-      font-size: 22px;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
+      image-rendering: crisp-edges;
     }
 
     .footer-note {
@@ -645,7 +593,7 @@
       </div>
     </div>
 
-    <!-- 3. แถบ Payment (กล่องอธิบาย + โพสต์รูป Grid 2 ภาพ) -->
+    <!-- 3. แถบ Payment (กล่องอธิบาย + โพสต์รูปขนาดจริง ชัดเต็มจอ) -->
     <div class="tab-section" id="tab-payment">
       <div class="payment-explain-box">
 𝓦𝓪𝓵𝓵𝓮𝓽 - 0617671126 
@@ -655,13 +603,13 @@ name : กวินธิดา
 name : กวินธิดา
       </div>
 
-      <!-- Grid 2 ภาพ กดขยายดูขนาดเต็มจอ 100% -->
-      <div class="payment-grid-gallery">
-        <div class="payment-grid-item" onclick="openLightbox('https://i.ibb.co/5xCYVJ6V/line-oa-chat-261008-205759.jpg')">
-          <img src="https://i.ibb.co/5xCYVJ6V/line-oa-chat-261008-205759.jpg" alt="Payment Post 1" loading="lazy">
+      <!-- โพสต์แสดงภาพขนาดจริง สัดส่วนเต็ม ไม่ตัดขอบ -->
+      <div class="payment-posts-container">
+        <div class="payment-post-card">
+          <img src="https://i.ibb.co/5xCYVJ6V/line-oa-chat-261008-205759.jpg" alt="Payment Post 1">
         </div>
-        <div class="payment-grid-item" onclick="openLightbox('https://i.ibb.co/8gJ40Knp/line-oa-chat-261008-205801.jpg')">
-          <img src="https://i.ibb.co/8gJ40Knp/line-oa-chat-261008-205801.jpg" alt="Payment Post 2" loading="lazy">
+        <div class="payment-post-card">
+          <img src="https://i.ibb.co/8gJ40Knp/line-oa-chat-261008-205801.jpg" alt="Payment Post 2">
         </div>
       </div>
     </div>
@@ -669,12 +617,6 @@ name : กวินธิดา
     <!-- ข้อความล่างสุด -->
     <div class="footer-note">Thank you for your support Jiāníng ⠀݁╸𓈒♡⏦𐄙 ཾ</div>
 
-  </div>
-
-  <!-- Lightbox Modal ขยายเต็มจอ คมชัด 100% -->
-  <div class="img-lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
-    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-    <img id="lightboxImg" src="" alt="Full view" onclick="event.stopPropagation()">
   </div>
 
   <!-- Story Modal -->
@@ -731,17 +673,6 @@ name : กวินธิดา
       document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
       event.currentTarget.classList.add('active');
       document.getElementById(`tab-${tabId}`).classList.add('active');
-    }
-
-    /* Lightbox Modal ขยายเต็มจอ */
-    function openLightbox(url) {
-      const img = document.getElementById('lightboxImg');
-      img.src = url;
-      document.getElementById('lightboxModal').classList.add('active');
-    }
-
-    function closeLightbox() {
-      document.getElementById('lightboxModal').classList.remove('active');
     }
 
     let highlightsData = [];
