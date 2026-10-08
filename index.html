@@ -79,7 +79,7 @@
       z-index: 2;
     }
 
-    /* แถบด้านบนสีเขียวมิ้นต์ */
+    /* แถบด้านบนสีเขียวมิ้นต์ทั้งหมด */
     .top-navbar {
       background: var(--mint-bg);
       border: 1.5px solid var(--mint-border);
@@ -379,7 +379,7 @@
       box-shadow: 0 4px 14px rgba(29, 110, 93, 0.15);
     }
 
-    /* Payment Card & Full-Scale Posts */
+    /* Payment Card & High-Res Full Scale Posts */
     .payment-explain-box {
       background: #ffffff;
       border: 1.5px solid var(--border-pink);
@@ -394,7 +394,6 @@
       margin-bottom: 20px;
     }
 
-    /* โพสต์ภาพแนวตั้งขนาดจริง คมชัดเต็มตา ไม่ย่อส่วน ไม่ตัดขอบ */
     .payment-posts-container {
       display: flex;
       flex-direction: column;
@@ -416,8 +415,7 @@
       height: auto;
       display: block;
       border-radius: 18px;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
+      image-rendering: auto;
     }
 
     .footer-note {
@@ -593,7 +591,7 @@
       </div>
     </div>
 
-    <!-- 3. แถบ Payment (กล่องอธิบาย + โพสต์รูปขนาดจริง ชัดเต็มจอ) -->
+    <!-- 3. แถบ Payment (ภาพ Catbox ชัดระดับ 100% ตัวเต็ม) -->
     <div class="tab-section" id="tab-payment">
       <div class="payment-explain-box">
 𝓦𝓪𝓵𝓵𝓮𝓽 - 0617671126 
@@ -603,13 +601,13 @@ name : กวินธิดา
 name : กวินธิดา
       </div>
 
-      <!-- โพสต์แสดงภาพขนาดจริง สัดส่วนเต็ม ไม่ตัดขอบ -->
+      <!-- โพสต์แสดงภาพไฟล์เต็ม คมชัด ไม่แตก -->
       <div class="payment-posts-container">
         <div class="payment-post-card">
-          <img src="https://i.ibb.co/5xCYVJ6V/line-oa-chat-261008-205759.jpg" alt="Payment Post 1">
+          <img src="https://files.catbox.moe/2h4683.jpeg" alt="Payment Post 1">
         </div>
         <div class="payment-post-card">
-          <img src="https://i.ibb.co/8gJ40Knp/line-oa-chat-261008-205801.jpg" alt="Payment Post 2">
+          <img src="https://files.catbox.moe/290uqn.jpeg" alt="Payment Post 2">
         </div>
       </div>
     </div>
