@@ -18,8 +18,13 @@
       --card-white: rgba(255, 255, 255, 0.96);
       --deep-pink: #fb6f92;
       --border-pink: #ffc2d1;
-      --mint-pastel: #bbf2e5;
-      --mint-text: #226f5e;
+      
+      /* โทนเขียวมิ้นต์พาสเทล */
+      --mint-bg: #e6f9f4;
+      --mint-border: #a8ebd9;
+      --mint-active: #c2f4e7;
+      --mint-text: #1d6e5d;
+      
       --text-dark: #4a3e3d;
       --text-muted: #8e7c7e;
       --shadow-soft: 0 10px 30px rgba(251, 111, 146, 0.18);
@@ -74,64 +79,41 @@
       z-index: 2;
     }
 
-    /* 3 แถบด้านบน */
+    /* แถบด้านบนสีเขียวมิ้นต์ทั้งหมด */
     .top-navbar {
-      background: var(--card-white);
-      border: 1.5px solid var(--border-pink);
+      background: var(--mint-bg);
+      border: 1.5px solid var(--mint-border);
       border-radius: 26px;
-      padding: 5px 8px;
+      padding: 5px 6px;
       display: flex;
       align-items: center;
       gap: 6px;
       margin-bottom: 18px;
-      box-shadow: var(--shadow-soft);
+      box-shadow: 0 4px 16px rgba(168, 235, 217, 0.35);
     }
 
     .nav-tab-btn {
       flex: 1;
-      padding: 8px 0;
+      padding: 9px 0;
       border: none;
       background: none;
       font-size: 13.5px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--mint-text);
       border-radius: 20px;
       cursor: pointer;
       text-align: center;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      opacity: 0.75;
     }
 
     .nav-tab-btn.active {
       background: #ffffff;
-      color: var(--deep-pink);
-      box-shadow: 0 3px 12px rgba(251, 111, 146, 0.2);
-    }
-
-    /* แถบคอนแทคบนสีมิ้นต์ */
-    .nav-tab-btn.mint-tab {
-      background: #e8faf6;
       color: var(--mint-text);
-      border: 1px solid var(--mint-pastel);
-    }
-
-    .nav-tab-btn.mint-tab.active {
-      background: var(--mint-pastel);
-      color: var(--mint-text);
-      box-shadow: 0 3px 12px rgba(34, 111, 94, 0.2);
-    }
-
-    .music-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 1.5px solid var(--border-pink);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      cursor: pointer;
-      flex-shrink: 0;
+      font-weight: 700;
+      opacity: 1;
+      box-shadow: 0 3px 10px rgba(29, 110, 93, 0.15);
+      border: 1px solid var(--mint-border);
     }
 
     .tab-section { display: none; }
@@ -364,11 +346,11 @@
     /* Contact Card */
     .contact-big-card {
       background: #ffffff;
-      border: 1.5px solid var(--mint-pastel);
+      border: 1.5px solid var(--mint-border);
       border-radius: 24px;
       padding: 22px 18px;
       text-align: center;
-      box-shadow: 0 8px 24px rgba(34, 111, 94, 0.08);
+      box-shadow: 0 8px 24px rgba(29, 110, 93, 0.08);
       margin-bottom: 16px;
     }
 
@@ -386,14 +368,14 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      background: linear-gradient(135deg, #c5f5ea, var(--mint-pastel));
+      background: linear-gradient(135deg, #d3f7ee, var(--mint-border));
       color: var(--mint-text);
       text-decoration: none;
       font-weight: 700;
       font-size: 14px;
       padding: 14px;
       border-radius: 20px;
-      box-shadow: 0 4px 14px rgba(34, 111, 94, 0.15);
+      box-shadow: 0 4px 14px rgba(29, 110, 93, 0.15);
     }
 
     /* Payment Card */
@@ -519,17 +501,16 @@
 
   <div class="floating-layer" id="emojiLayer"></div>
 
-  <!-- ลิงก์เพลงตามที่ระบุ -->
-  <audio id="bgMusic" loop preload="auto" src="https://file.garden/asG8Gt-rqWIpi3II/%5BThaisub%20%E0%B8%8B%E0%B8%B1%E0%B8%9A%E0%B9%84%E0%B8%97%E0%B8%A2%5D%20%E8%AF%A5%E6%AD%BB%E7%9A%84%E7%88%B1%E6%83%85%EF%BC%88%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%A3%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%AE%E0%B9%87%E0%B8%87%E0%B8%8B%E0%B8%A7%E0%B8%A2%EF%BC%89%E2%80%94%20%E9%98%BF%E6%9F%B4.mp3"></audio>
+  <!-- เพลงวนลูปอัตโนมัติ -->
+  <audio id="bgMusic" loop autoplay preload="auto" playsinline src="https://file.garden/asG8Gt-rqWIpi3II/%5BThaisub%20%E0%B8%8B%E0%B8%B1%E0%B8%9A%E0%B9%84%E0%B8%97%E0%B8%A2%5D%20%E8%AF%A5%E6%AD%BB%E7%9A%84%E7%88%B1%E6%83%85%EF%BC%88%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%A3%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%AE%E0%B9%87%E0%B8%87%E0%B8%8B%E0%B8%A7%E0%B8%A2%EF%BC%89%E2%80%94%20%E9%98%BF%E6%9F%B4.mp3"></audio>
 
   <div class="container">
 
-    <!-- 3 แถบด้านบน -->
+    <!-- แถบด้านบนสีเขียวมิ้นต์ทั้งหมด (ไม่มีปุ่ม 🎵) -->
     <div class="top-navbar">
       <button type="button" class="nav-tab-btn active" onclick="switchTab('home')">Home</button>
-      <button type="button" class="nav-tab-btn mint-tab" onclick="switchTab('contact')">contact</button>
+      <button type="button" class="nav-tab-btn" onclick="switchTab('contact')">contact</button>
       <button type="button" class="nav-tab-btn" onclick="switchTab('payment')">payment</button>
-      <button type="button" class="music-btn" onclick="toggleAudio()">🎵</button>
     </div>
 
     <!-- 1. แถบ Home -->
@@ -615,7 +596,6 @@ name : กวินธิดา
   </div>
 
   <script>
-    // แยกฐานข้อมูลใหม่เด็ดขาด 100%
     const DB_SITE = "jianing_site_data";
     const DB_HL = "jianing_site_highlights";
     const DB_REVIEWS = "jianing_site_reviews";
@@ -634,23 +614,22 @@ name : กวินธิดา
 
     const music = document.getElementById('bgMusic');
     let audioContext;
-    function unlockAudio() {
+
+    // เล่นเพลงทันทีที่เข้าหน้าเว็บแบบสมบูรณ์
+    function startMusic() {
       if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
       if (audioContext.state === 'suspended') audioContext.resume();
-      if (music.paused && music.src) music.play().catch(() => {});
+      if (music.paused) music.play().catch(() => {});
     }
-    window.addEventListener('load', unlockAudio);
-    ['touchstart', 'touchend', 'click', 'scroll', 'pointerdown'].forEach(e => {
-      document.addEventListener(e, function run() {
-        unlockAudio();
-        document.removeEventListener(e, run);
+
+    window.addEventListener('load', startMusic);
+    document.addEventListener('DOMContentLoaded', startMusic);
+    ['touchstart', 'touchend', 'click', 'scroll', 'pointerdown', 'mousemove'].forEach(evt => {
+      document.addEventListener(evt, function trigger() {
+        startMusic();
+        document.removeEventListener(evt, trigger);
       }, { passive: true });
     });
-
-    function toggleAudio() {
-      if (music.paused) music.play().catch(() => {});
-      else music.pause();
-    }
 
     function switchTab(tabId) {
       document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
@@ -669,11 +648,10 @@ name : กวินธิดา
       if (d.storeBio) document.getElementById('mainStoreBio').textContent = d.storeBio;
       if (d.musicUrl && music.src !== d.musicUrl) {
         music.src = d.musicUrl;
-        unlockAudio();
+        startMusic();
       }
     }
 
-    // แคชเครื่อง โหลดไวไม่แวบ
     try {
       const cached = localStorage.getItem('jianing_cached_data');
       if (cached) applyData(JSON.parse(cached));
@@ -687,7 +665,6 @@ name : กวินธิดา
       }
     });
 
-    // ดึงไฮไลท์แยกก้อน ไม่ชนเพดาน 1 MB
     db.collection(DB_HL).orderBy("order", "asc").onSnapshot(snap => {
       highlightsData = [];
       snap.forEach(doc => {
@@ -867,7 +844,7 @@ name : กวินธิดา
       }
     }
 
-    // ไอคอนลอยตามสั่ง: 🍏 🍬 🛼 🌸
+    // ไอคอนลอย: 🍏 🍬 🛼 🌸
     const icons = ['🍏', '🍬', '🛼', '🌸'];
     const layer = document.getElementById('emojiLayer');
     setInterval(() => {
