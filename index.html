@@ -333,7 +333,7 @@
       gap: 8px;
     }
 
-    /* Modal ป๊อปอัปฟอร์มรีวิวตามภาพตัวอย่าง */
+    /* Modal ฟอร์มเขียนรีวิว */
     .review-modal-overlay {
       display: none;
       position: fixed;
@@ -505,6 +505,25 @@
       gap: 6px;
     }
 
+    /* Single Post Card สไตล์คมชัดเต็มความกว้าง */
+    .single-post-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-pink);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      padding: 8px;
+      margin-top: 18px;
+    }
+
+    .single-post-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 18px;
+      image-rendering: auto;
+    }
+
     /* Contact Card */
     .contact-big-card {
       background: #ffffff;
@@ -540,7 +559,7 @@
       box-shadow: 0 4px 14px rgba(29, 110, 93, 0.15);
     }
 
-    /* Payment Card & High-Res Full Scale Posts */
+    /* Payment Card */
     .payment-explain-box {
       background: #ffffff;
       border: 1.5px solid var(--border-pink);
@@ -552,31 +571,6 @@
       color: var(--text-dark);
       white-space: pre-line;
       text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .payment-posts-container {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      margin-bottom: 20px;
-    }
-
-    .payment-post-card {
-      background: #ffffff;
-      border: 1.5px solid var(--border-pink);
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: var(--shadow-soft);
-      padding: 8px;
-    }
-
-    .payment-post-card img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 18px;
-      image-rendering: auto;
     }
 
     .footer-note {
@@ -731,7 +725,7 @@
       </div>
     </div>
 
-    <!-- 2. แถบ Contact -->
+    <!-- 2. แถบ Contact (พร้อมรูปคิวอาร์ไลน์ขนาดจริง ชัด 100%) -->
     <div class="tab-section" id="tab-contact">
       <div class="contact-big-card">
         <div class="contact-title">⬚ྀི༷ 𖥻 ׁ ♡  Contact Jiāníng ̶ּ༷ ཾ♡‎יִ‎
@@ -740,9 +734,14 @@
           <span>💬 ทัก LINE เพื่อติดต่อสอบถาม / สั่งซื้อ ♡</span>
         </a>
       </div>
+
+      <!-- โพสต์รูปคิวอาร์ไลน์ -->
+      <div class="single-post-card">
+        <img src="https://files.catbox.moe/2h4683.jpeg" alt="QR Code LINE">
+      </div>
     </div>
 
-    <!-- 3. แถบ Payment -->
+    <!-- 3. แถบ Payment (พร้อมรูปบัญชีขนาดจริง ชัด 100%) -->
     <div class="tab-section" id="tab-payment">
       <div class="payment-explain-box">
 𝓦𝓪𝓵𝓵𝓮𝓽 - 0617671126 
@@ -752,14 +751,9 @@ name : กวินธิดา
 name : กวินธิดา
       </div>
 
-      <!-- โพสต์แสดงภาพไฟล์เต็ม คมชัด ไม่แตก -->
-      <div class="payment-posts-container">
-        <div class="payment-post-card">
-          <img src="https://files.catbox.moe/2h4683.jpeg" alt="Payment Post 1">
-        </div>
-        <div class="payment-post-card">
-          <img src="https://files.catbox.moe/290uqn.jpeg" alt="Payment Post 2">
-        </div>
+      <!-- โพสต์รูปบัญชี -->
+      <div class="single-post-card">
+        <img src="https://files.catbox.moe/290uqn.jpeg" alt="Payment Info">
       </div>
     </div>
 
