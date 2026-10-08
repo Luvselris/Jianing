@@ -291,10 +291,11 @@
     }
 
     .review-time {
-      font-size: 10.5px;
-      color: #b5a9ab;
-      margin-top: 4px;
+      font-size: 11px;
+      color: #9c898c;
+      margin-top: 6px;
       text-align: right;
+      font-weight: 500;
     }
 
     .input-field, .textarea-field {
@@ -378,7 +379,7 @@
       box-shadow: 0 4px 14px rgba(29, 110, 93, 0.15);
     }
 
-    /* Payment Card */
+    /* Payment Card & Grid Gallery */
     .payment-explain-box {
       background: #ffffff;
       border: 1.5px solid var(--border-pink);
@@ -390,6 +391,77 @@
       color: var(--text-dark);
       white-space: pre-line;
       text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .payment-grid-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .payment-grid-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1.5px solid var(--border-pink);
+      background: #ffffff;
+      box-shadow: 0 6px 18px rgba(251, 111, 146, 0.15);
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .payment-grid-item:active {
+      transform: scale(0.97);
+    }
+
+    .payment-grid-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Lightbox Modal สำหรับดูรูปเต็ม */
+    .img-lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 9999999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .img-lightbox-modal.active {
+      display: flex;
+    }
+
+    .img-lightbox-modal img {
+      max-width: 96vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: rgba(255, 255, 255, 0.25);
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .footer-note {
@@ -506,7 +578,7 @@
 
   <div class="container">
 
-    <!-- แถบด้านบนสีเขียวมิ้นต์ทั้งหมด (ไม่มีปุ่ม 🎵) -->
+    <!-- แถบด้านบนสีเขียวมิ้นต์ทั้งหมด -->
     <div class="top-navbar">
       <button type="button" class="nav-tab-btn active" onclick="switchTab('home')">Home</button>
       <button type="button" class="nav-tab-btn" onclick="switchTab('contact')">contact</button>
@@ -565,7 +637,7 @@
       </div>
     </div>
 
-    <!-- 3. แถบ Payment (กล่องอธิบายอย่างเดียว) -->
+    <!-- 3. แถบ Payment (กล่องอธิบาย + โพสต์รูป Grid 2 ภาพ) -->
     <div class="tab-section" id="tab-payment">
       <div class="payment-explain-box">
 𝓦𝓪𝓵𝓵𝓮𝓽 - 0617671126 
@@ -574,11 +646,27 @@ name : กวินธิดา
 𝓚𝓫𝓪𝓷𝓴 - 2291443012
 name : กวินธิดา
       </div>
+
+      <!-- Grid 2 ภาพขนาดชัดเต็มตา กดดูขนาดจริงได้ -->
+      <div class="payment-grid-gallery">
+        <div class="payment-grid-item" onclick="openLightbox('https://i.ibb.co/5xCYVJ6V/line-oa-chat-261008-205759.jpg')">
+          <img src="https://i.ibb.co/5xCYVJ6V/line-oa-chat-261008-205759.jpg" alt="Payment Post 1" loading="lazy">
+        </div>
+        <div class="payment-grid-item" onclick="openLightbox('https://i.ibb.co/8gJ40Knp/line-oa-chat-261008-205801.jpg')">
+          <img src="https://i.ibb.co/8gJ40Knp/line-oa-chat-261008-205801.jpg" alt="Payment Post 2" loading="lazy">
+        </div>
+      </div>
     </div>
 
     <!-- ข้อความล่างสุด -->
     <div class="footer-note">Thank you for your support Jiāníng ⠀݁╸𓈒♡⏦𐄙 ཾ</div>
 
+  </div>
+
+  <!-- Lightbox Modal สำหรับขยายรูปดูขนาดจริง -->
+  <div class="img-lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lightboxImg" src="" alt="Full view" onclick="event.stopPropagation()">
   </div>
 
   <!-- Story Modal -->
@@ -615,7 +703,6 @@ name : กวินธิดา
     const music = document.getElementById('bgMusic');
     let audioContext;
 
-    // เล่นเพลงทันทีที่เข้าหน้าเว็บแบบสมบูรณ์
     function startMusic() {
       if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
       if (audioContext.state === 'suspended') audioContext.resume();
@@ -636,6 +723,16 @@ name : กวินธิดา
       document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
       event.currentTarget.classList.add('active');
       document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    /* Lightbox Modal */
+    function openLightbox(url) {
+      document.getElementById('lightboxImg').src = url;
+      document.getElementById('lightboxModal').classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightboxModal').classList.remove('active');
     }
 
     let highlightsData = [];
@@ -777,7 +874,7 @@ name : กวินธิดา
     bindTap(document.getElementById('storyTapRight'), nextStorySlide);
     bindTap(document.getElementById('storyTapLeft'), prevStorySlide);
 
-    // Reviews
+    // Reviews System พร้อมแสดงวันและเวลา
     let currentRating = 5;
     function setStars(star) {
       currentRating = star;
@@ -825,12 +922,17 @@ name : กวินธิดา
       btn.disabled = true;
       try {
         const now = new Date();
-        const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
+        // ฟอร์แมตวันและเวลาอย่างละเอียด: เช่น "8 ต.ค. 2026, 21:05 น."
+        const dayMonthYear = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const fullDateTimeStr = `${dayMonthYear}, ${hours}:${minutes} น.`;
+
         await db.collection(DB_REVIEWS).add({
           name: name,
           stars: currentRating,
           feedback: feedback,
-          dateStr: dateStr,
+          dateStr: fullDateTimeStr,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         nameInput.value = '';
