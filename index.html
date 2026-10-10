@@ -886,12 +886,18 @@ name : กวินธิดา
         applyData(d);
       }
     });
-
-    db.collection(DB_HL).orderBy("order", "asc").onSnapshot(snap => {
+db.collection(DB_HL).orderBy("order", "asc").onSnapshot(async snap => {
       highlightsData = [];
-      snap.forEach(doc => {
-        highlightsData.push(doc.data());
-      });
+      for (const doc of snap.docs) {
+        const hl = { id: doc.id, ...doc.data() };
+        const slidesSnap = await db.collection(DB_HL).doc(doc.id).collection("slides").orderBy("idx", "asc").get();
+        if (!slidesSnap.empty) {
+          hl.images = slidesSnap.docs.map(s => s.data().url);
+        } else if (!hl.images) {
+          hl.images = [];
+        }
+        highlightsData.push(hl);
+      }
       renderHighlights(highlightsData);
     });
 
