@@ -47,6 +47,9 @@
       background: #fff; color: var(--text-main);
       outline: none; margin-bottom: 12px;
     }
+    .input-field:focus, .textarea-field:focus {
+      border-color: var(--deep-pink);
+    }
     .btn-pink {
       width: 100%;
       background: linear-gradient(135deg, #ffc2d1, var(--deep-pink));
@@ -75,28 +78,18 @@
       border-radius: 20px; padding: 16px;
       margin-bottom: 16px;
     }
-    .stories-grid {
+    .stories-preview-grid {
       display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 6px; margin-top: 10px;
+      gap: 6px; margin-top: 10px; margin-bottom: 10px;
     }
     .story-slot {
       position: relative; aspect-ratio: 1;
-      border-radius: 12px; border: 1px dashed var(--border-pink);
+      border-radius: 12px; border: 1px solid var(--border-pink);
       overflow: hidden; background: #fffafa;
-      display: flex; align-items: center; justify-content: center;
     }
     .story-slot img { width: 100%; height: 100%; object-fit: cover; }
-    .del-btn {
-      position: absolute; top: 2px; right: 2px;
-      background: rgba(255, 77, 109, 0.9);
-      color: #fff; border: none; border-radius: 50%;
-      width: 20px; height: 20px; font-size: 11px; cursor: pointer;
-    }
-    .file-btn {
-      display: inline-block;
-      background: linear-gradient(135deg, #ffc2d1, var(--deep-pink));
-      color: #fff; padding: 7px 18px; border-radius: 16px;
-      font-size: 12px; font-weight: 600; cursor: pointer;
+    .field-hint {
+      font-size: 11.5px; color: var(--text-muted); margin-bottom: 6px; display: block;
     }
   </style>
 </head>
@@ -124,29 +117,28 @@
 
       <div class="panel-card">
         <div class="panel-title"><span>🎀 ข้อมูลร้านและรูปภาพ</span></div>
-        <div style="margin-bottom:12px;">
-          <label style="font-size:12px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">รูปแบนเนอร์:</label>
-          <input type="file" accept="image/*" onchange="uploadDirect(event, 'banner')">
-        </div>
-        <div style="margin-bottom:12px;">
-          <label style="font-size:12px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">รูปโปรไฟล์:</label>
-          <input type="file" accept="image/*" onchange="uploadDirect(event, 'profile')">
-        </div>
+        <span class="field-hint">ลิงก์รูปแบนเนอร์:</span>
+        <input type="url" id="bannerInput" class="input-field" placeholder="https://files.catbox.moe/...">
+        <span class="field-hint">ลิงก์รูปโปรไฟล์:</span>
+        <input type="url" id="profileInput" class="input-field" placeholder="https://files.catbox.moe/...">
+        <span class="field-hint">ชื่อร้าน:</span>
         <input type="text" id="storeNameInput" class="input-field" placeholder="Yuè Jiāníng ♡">
-        <textarea id="storeBioInput" class="textarea-field" rows="3" placeholder="ข้อความแนะนำร้าน..."></textarea>
-        <input type="url" id="musicUrlInput" class="input-field" placeholder="ลิงก์ไฟล์เสียง .mp3">
+        <span class="field-hint">คำแนะนำร้าน:</span>
+        <textarea id="storeBioInput" class="textarea-field" rows="3"></textarea>
+        <span class="field-hint">ลิงก์เพลง (.mp3):</span>
+        <input type="url" id="musicUrlInput" class="input-field" placeholder="https://file.garden/...">
       </div>
 
       <div class="panel-card">
         <div class="panel-title">
-          <span>✨ จัดการไฮไลท์ (เพิ่มได้ไม่จำกัด)</span>
-          <button type="button" style="background:#fff; border:1px solid var(--border-pink); color:var(--deep-pink); padding:4px 12px; border-radius:14px; font-size:11px; cursor:pointer;" onclick="addNewHighlight()">+ เพิ่มไฮไลท์ใหม่</button>
+          <span>✨ ไฮไลท์ (ภาพชัด 100% ไม่จำกัดจำนวน)</span>
+          <button type="button" style="background:#fff; border:1px solid var(--border-pink); color:var(--deep-pink); padding:5px 12px; border-radius:14px; font-size:12px; cursor:pointer;" onclick="addNewHighlight()">+ เพิ่มไฮไลท์</button>
         </div>
         <div id="highlightsAdminBox"></div>
       </div>
 
       <button type="button" class="btn-pink" id="saveAllBtn" style="font-size:15px; padding:15px; margin-bottom:20px;" onclick="saveAllToCloud()">
-        ☁️ บันทึกขึ้นระบบทันที (หน้าเว็บเปลี่ยนสด) ♡
+        ☁️ บันทึกขึ้นระบบทันที (ภาพชัด 100%) ♡
       </button>
 
       <div class="panel-card">
@@ -177,14 +169,7 @@
     if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    let siteData = {
-      banner: "",
-      profile: "",
-      storeName: "Yuè Jiāníng ♡",
-      storeBio: "ยินดีต้อนรับเข้าสู่ร้าน Yuè Jiāníng ♡\nสามารถกดดูไฮไลท์ที่เราลงไว้เพื่อดูตัวอย่างได้เลย ขอบคุณที่กดเข้ามานะคะ",
-      musicUrl: "https://file.garden/asG8Gt-rqWIpi3II/%5BThaisub%20%E0%B8%8B%E0%B8%B1%E0%B8%9A%E0%B9%84%E0%B8%97%E0%B8%A2%5D%20%E8%AF%A5%E6%AD%BB%E7%9A%84%E7%88%B1%E6%83%85%EF%BC%88%E0%B8%84%E0%B8%A7%E0%B8%B2%E0%B8%A1%E0%B8%A3%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%AE%E0%B9%87%E0%B8%87%E0%B8%8B%E0%B8%A7%E0%B8%A2%EF%BC%89%E2%80%94%20%E9%98%BF%E6%9F%B4.mp3"
-    };
-
+    let siteData = { banner: "", profile: "", storeName: "Yuè Jiāníng ♡", storeBio: "", musicUrl: "" };
     let highlightsList = [];
 
     window.onload = function() {
@@ -223,13 +208,17 @@
         snap.forEach(d => {
           highlightsList.push({ id: d.id, ...d.data() });
         });
-      } catch (err) {}
+      } catch (err) {
+        console.error(err);
+      }
 
       renderAdminPanels();
       listenReviewsAdmin();
     }
 
     function renderAdminPanels() {
+      document.getElementById('bannerInput').value = siteData.banner || '';
+      document.getElementById('profileInput').value = siteData.profile || '';
       document.getElementById('storeNameInput').value = siteData.storeName || '';
       document.getElementById('storeBioInput').value = siteData.storeBio || '';
       document.getElementById('musicUrlInput').value = siteData.musicUrl || '';
@@ -238,7 +227,7 @@
       hlBox.innerHTML = '';
 
       if (highlightsList.length === 0) {
-        hlBox.innerHTML = '<p style="font-size:12px; color:var(--text-muted); padding:10px 0;">ยังไม่มีไฮไลท์ กดปุ่ม "+ เพิ่มไฮไลท์ใหม่" ได้เลยค่ะ</p>';
+        hlBox.innerHTML = '<p style="font-size:12px; color:var(--text-muted); padding:10px 0;">ยังไม่มีไฮไลท์ กดปุ่ม "+ เพิ่มไฮไลท์" ด้านบนได้เลยค่ะ</p>';
         return;
       }
 
@@ -246,39 +235,45 @@
         const card = document.createElement('div');
         card.className = 'hl-admin-card';
 
-        let storiesHTML = '';
-        if (hl.images) {
-          hl.images.forEach((stImg, sIdx) => {
-            storiesHTML += `
-              <div class="story-slot">
-                <img src="${stImg}">
-                <button class="del-btn" onclick="removeStoryImage(${hIdx}, ${sIdx})">✕</button>
-              </div>
-            `;
-          });
-        }
+        const imgsList = hl.images || [];
+        let previewHTML = '';
+        imgsList.forEach((url) => {
+          if (url.trim()) {
+            previewHTML += `<div class="story-slot"><img src="${url.trim()}" onerror="this.src='https://placehold.co/100?text=Error'"></div>`;
+          }
+        });
+
+        const urlsJoined = imgsList.join('\n');
 
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <div style="font-weight:700; color:var(--deep-pink); font-size:13.5px;">ไฮไลท์ที่ ${hIdx + 1}</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="font-weight:700; color:var(--deep-pink); font-size:14px;">ไฮไลท์ที่ ${hIdx + 1}</div>
             <button onclick="removeHighlight(${hIdx})" style="background:none; border:none; color:#ff4d6d; font-size:12px; cursor:pointer;">ลบไฮไลท์นี้ 🗑️</button>
           </div>
+          <span class="field-hint">ชื่อไฮไลท์:</span>
           <input type="text" class="input-field" value="${hl.title || ''}" placeholder="ชื่อไฮไลท์" onchange="highlightsList[${hIdx}].title = this.value">
-          <div style="font-size:12px; margin-bottom:6px; color:var(--text-muted);">
-            เปลี่ยนรูปปก: <input type="file" accept="image/*" onchange="changeHlCover(event, ${hIdx})">
-          </div>
-          <div style="font-size:12px; margin-bottom:6px; color:var(--text-muted);">
-            + เพิ่มรูปสตอรี่ (เพิ่มได้ไม่จำกัด): <input type="file" accept="image/*" multiple onchange="addStoryImages(event, ${hIdx})">
-          </div>
-          <div class="stories-grid">${storiesHTML}</div>
+          
+          <span class="field-hint">ลิงก์รูปปก (URL):</span>
+          <input type="url" class="input-field" value="${hl.cover || ''}" placeholder="https://files.catbox.moe/..." onchange="highlightsList[${hIdx}].cover = this.value; renderAdminPanels();">
+          
+          <span class="field-hint">ลิงก์รูปภาพในสตอรี่ (วาง 1 ลิงก์ ต่อ 1 บรรทัด - ใส่ได้ไม่จำกัด ชัด 100%):</span>
+          <textarea class="textarea-field" rows="4" placeholder="https://files.catbox.moe/image1.jpg&#10;https://files.catbox.moe/image2.jpg" onchange="updateHlImages(${hIdx}, this.value)">${urlsJoined}</textarea>
+          
+          ${previewHTML ? `<span class="field-hint">ตัวอย่างรูป (${imgsList.length} รูป):</span><div class="stories-preview-grid">${previewHTML}</div>` : ''}
         `;
         hlBox.appendChild(card);
       });
     }
 
+    function updateHlImages(idx, textVal) {
+      const arr = textVal.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+      highlightsList[idx].images = arr;
+      renderAdminPanels();
+    }
+
     function addNewHighlight() {
       highlightsList.push({
-        title: `Highlight ${highlightsList.length + 1}`,
+        title: `Credit Highlights`,
         cover: "",
         images: [],
         order: highlightsList.length
@@ -297,63 +292,14 @@
       }
     }
 
-    function compressImage(file, maxWidth = 640, quality = 0.7) {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let w = img.width, h = img.height;
-            if (w > maxWidth) {
-              h = Math.round((h * maxWidth) / w);
-              w = maxWidth;
-            }
-            canvas.width = w;
-            canvas.height = h;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, w, h);
-            resolve(canvas.toDataURL('image/jpeg', quality));
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    async function uploadDirect(e, key) {
-      if (e.target.files && e.target.files[0]) {
-        siteData[key] = await compressImage(e.target.files[0], 600, 0.72);
-      }
-    }
-
-    async function changeHlCover(e, idx) {
-      if (e.target.files && e.target.files[0]) {
-        highlightsList[idx].cover = await compressImage(e.target.files[0], 250, 0.7);
-      }
-    }
-
-    async function addStoryImages(e, idx) {
-      const files = Array.from(e.target.files);
-      if (!highlightsList[idx].images) highlightsList[idx].images = [];
-      for (const file of files) {
-        const b64 = await compressImage(file, 640, 0.68);
-        highlightsList[idx].images.push(b64);
-      }
-      renderAdminPanels();
-    }
-
-    function removeStoryImage(hlIdx, storyIdx) {
-      highlightsList[hlIdx].images.splice(storyIdx, 1);
-      renderAdminPanels();
-    }
-
     async function saveAllToCloud() {
       const btn = document.getElementById('saveAllBtn');
       btn.disabled = true;
       btn.textContent = 'กำลังบันทึกข้อมูล... ⏳';
 
-      siteData.storeName = document.getElementById('storeNameInput').value;
+      siteData.banner = document.getElementById('bannerInput').value.trim();
+      siteData.profile = document.getElementById('profileInput').value.trim();
+      siteData.storeName = document.getElementById('storeNameInput').value.trim();
       siteData.storeBio = document.getElementById('storeBioInput').value;
       siteData.musicUrl = document.getElementById('musicUrlInput').value.trim();
 
@@ -363,7 +309,7 @@
         for (let i = 0; i < highlightsList.length; i++) {
           const hl = highlightsList[i];
           const hlDoc = {
-            title: hl.title || `Highlight ${i + 1}`,
+            title: hl.title || `Credit Highlights`,
             cover: hl.cover || (hl.images && hl.images[0]) || "",
             images: hl.images || [],
             order: i
@@ -376,12 +322,13 @@
           }
         }
 
-        alert('✨ บันทึกข้อมูลและไฮไลท์ทั้งหมดเรียบร้อยแล้วค่ะ!');
+        alert('✨ บันทึกสำเร็จแล้วค่ะ! ภาพชัด 100% แน่นอน');
       } catch (err) {
-        alert('เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้ง');
+        console.error(err);
+        alert('เกิดข้อผิดพลาด: ' + err.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = '☁️ บันทึกขึ้นระบบทันที (หน้าเว็บเปลี่ยนสด) ♡';
+        btn.textContent = '☁️ บันทึกขึ้นระบบทันที (ภาพชัด 100%) ♡';
       }
     }
 
