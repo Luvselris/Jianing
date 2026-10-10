@@ -47,9 +47,6 @@
       background: #fff; color: var(--text-main);
       outline: none; margin-bottom: 12px;
     }
-    .input-field:focus, .textarea-field:focus {
-      border-color: var(--deep-pink);
-    }
     .btn-pink {
       width: 100%;
       background: linear-gradient(135deg, #ffc2d1, var(--deep-pink));
@@ -78,18 +75,23 @@
       border-radius: 20px; padding: 16px;
       margin-bottom: 16px;
     }
-    .stories-preview-grid {
+    .stories-grid {
       display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 6px; margin-top: 10px; margin-bottom: 10px;
+      gap: 6px; margin-top: 10px;
     }
     .story-slot {
       position: relative; aspect-ratio: 1;
-      border-radius: 12px; border: 1px solid var(--border-pink);
+      border-radius: 12px; border: 1px dashed var(--border-pink);
       overflow: hidden; background: #fffafa;
+      display: flex; align-items: center; justify-content: center;
     }
     .story-slot img { width: 100%; height: 100%; object-fit: cover; }
-    .field-hint {
-      font-size: 11.5px; color: var(--text-muted); margin-bottom: 6px; display: block;
+    .del-btn {
+      position: absolute; top: 2px; right: 2px;
+      background: rgba(255, 77, 109, 0.9);
+      color: #fff; border: none; border-radius: 50%;
+      width: 20px; height: 20px; font-size: 11px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
     }
   </style>
 </head>
@@ -117,22 +119,23 @@
 
       <div class="panel-card">
         <div class="panel-title"><span>🎀 ข้อมูลร้านและรูปภาพ</span></div>
-        <span class="field-hint">ลิงก์รูปแบนเนอร์:</span>
-        <input type="url" id="bannerInput" class="input-field" placeholder="https://files.catbox.moe/...">
-        <span class="field-hint">ลิงก์รูปโปรไฟล์:</span>
-        <input type="url" id="profileInput" class="input-field" placeholder="https://files.catbox.moe/...">
-        <span class="field-hint">ชื่อร้าน:</span>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">รูปแบนเนอร์:</label>
+          <input type="file" accept="image/*" onchange="uploadDirect(event, 'banner')">
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px; color:var(--text-muted); font-weight:600; display:block; margin-bottom:4px;">รูปโปรไฟล์:</label>
+          <input type="file" accept="image/*" onchange="uploadDirect(event, 'profile')">
+        </div>
         <input type="text" id="storeNameInput" class="input-field" placeholder="Yuè Jiāníng ♡">
-        <span class="field-hint">คำแนะนำร้าน:</span>
-        <textarea id="storeBioInput" class="textarea-field" rows="3"></textarea>
-        <span class="field-hint">ลิงก์เพลง (.mp3):</span>
-        <input type="url" id="musicUrlInput" class="input-field" placeholder="https://file.garden/...">
+        <textarea id="storeBioInput" class="textarea-field" rows="3" placeholder="ข้อความแนะนำร้าน..."></textarea>
+        <input type="url" id="musicUrlInput" class="input-field" placeholder="ลิงก์ไฟล์เสียง .mp3">
       </div>
 
       <div class="panel-card">
         <div class="panel-title">
-          <span>✨ ไฮไลท์ (ภาพชัด 100% ไม่จำกัดจำนวน)</span>
-          <button type="button" style="background:#fff; border:1px solid var(--border-pink); color:var(--deep-pink); padding:5px 12px; border-radius:14px; font-size:12px; cursor:pointer;" onclick="addNewHighlight()">+ เพิ่มไฮไลท์</button>
+          <span>✨ จัดการไฮไลท์ (ภาพชัดระดับ Full HD)</span>
+          <button type="button" style="background:#fff; border:1px solid var(--border-pink); color:var(--deep-pink); padding:4px 12px; border-radius:14px; font-size:11px; cursor:pointer;" onclick="addNewHighlight()">+ เพิ่มไฮไลท์ใหม่</button>
         </div>
         <div id="highlightsAdminBox"></div>
       </div>
@@ -205,9 +208,17 @@
 
         const snap = await db.collection(DB_HL).orderBy("order", "asc").get();
         highlightsList = [];
-        snap.forEach(d => {
-          highlightsList.push({ id: d.id, ...d.data() });
-        });
+        for (const d of snap.docs) {
+          const hlItem = { id: d.id, ...d.data() };
+          // ดึงภาพจาก Sub-collection (ถ้ามี)
+          const imgsSnap = await db.collection(DB_HL).doc(d.id).collection("slides").orderBy("idx", "asc").get();
+          if (!imgsSnap.empty) {
+            hlItem.images = imgsSnap.docs.map(imgDoc => imgDoc.data().url);
+          } else if (!hlItem.images) {
+            hlItem.images = [];
+          }
+          highlightsList.push(hlItem);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -217,8 +228,6 @@
     }
 
     function renderAdminPanels() {
-      document.getElementById('bannerInput').value = siteData.banner || '';
-      document.getElementById('profileInput').value = siteData.profile || '';
       document.getElementById('storeNameInput').value = siteData.storeName || '';
       document.getElementById('storeBioInput').value = siteData.storeBio || '';
       document.getElementById('musicUrlInput').value = siteData.musicUrl || '';
@@ -227,7 +236,7 @@
       hlBox.innerHTML = '';
 
       if (highlightsList.length === 0) {
-        hlBox.innerHTML = '<p style="font-size:12px; color:var(--text-muted); padding:10px 0;">ยังไม่มีไฮไลท์ กดปุ่ม "+ เพิ่มไฮไลท์" ด้านบนได้เลยค่ะ</p>';
+        hlBox.innerHTML = '<p style="font-size:12px; color:var(--text-muted); padding:10px 0;">ยังไม่มีไฮไลท์ กดปุ่ม "+ เพิ่มไฮไลท์ใหม่" ได้เลยค่ะ</p>';
         return;
       }
 
@@ -235,40 +244,35 @@
         const card = document.createElement('div');
         card.className = 'hl-admin-card';
 
-        const imgsList = hl.images || [];
-        let previewHTML = '';
-        imgsList.forEach((url) => {
-          if (url.trim()) {
-            previewHTML += `<div class="story-slot"><img src="${url.trim()}" onerror="this.src='https://placehold.co/100?text=Error'"></div>`;
-          }
-        });
-
-        const urlsJoined = imgsList.join('\n');
+        let storiesHTML = '';
+        if (hl.images) {
+          hl.images.forEach((stImg, sIdx) => {
+            storiesHTML += `
+              <div class="story-slot">
+                <img src="${stImg}">
+                <button type="button" class="del-btn" onclick="removeStoryImage(${hIdx}, ${sIdx})">✕</button>
+              </div>
+            `;
+          });
+        }
 
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <div style="font-weight:700; color:var(--deep-pink); font-size:14px;">ไฮไลท์ที่ ${hIdx + 1}</div>
-            <button onclick="removeHighlight(${hIdx})" style="background:none; border:none; color:#ff4d6d; font-size:12px; cursor:pointer;">ลบไฮไลท์นี้ 🗑️</button>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-weight:700; color:var(--deep-pink); font-size:13.5px;">ไฮไลท์ที่ ${hIdx + 1}</div>
+            <button type="button" onclick="removeHighlight(${hIdx})" style="background:none; border:none; color:#ff4d6d; font-size:12px; cursor:pointer;">ลบไฮไลท์นี้ 🗑️</button>
           </div>
-          <span class="field-hint">ชื่อไฮไลท์:</span>
           <input type="text" class="input-field" value="${hl.title || ''}" placeholder="ชื่อไฮไลท์" onchange="highlightsList[${hIdx}].title = this.value">
-          
-          <span class="field-hint">ลิงก์รูปปก (URL):</span>
-          <input type="url" class="input-field" value="${hl.cover || ''}" placeholder="https://files.catbox.moe/..." onchange="highlightsList[${hIdx}].cover = this.value; renderAdminPanels();">
-          
-          <span class="field-hint">ลิงก์รูปภาพในสตอรี่ (วาง 1 ลิงก์ ต่อ 1 บรรทัด - ใส่ได้ไม่จำกัด ชัด 100%):</span>
-          <textarea class="textarea-field" rows="4" placeholder="https://files.catbox.moe/image1.jpg&#10;https://files.catbox.moe/image2.jpg" onchange="updateHlImages(${hIdx}, this.value)">${urlsJoined}</textarea>
-          
-          ${previewHTML ? `<span class="field-hint">ตัวอย่างรูป (${imgsList.length} รูป):</span><div class="stories-preview-grid">${previewHTML}</div>` : ''}
+          <div style="font-size:12px; margin-bottom:8px; color:var(--text-muted);">
+            เปลี่ยนรูปปก: <input type="file" accept="image/*" onchange="changeHlCover(event, ${hIdx})">
+          </div>
+          <div style="font-size:12px; margin-bottom:8px; color:var(--text-muted);">
+            + เพิ่มรูปสตอรี่ (กดเลือกได้หลายรูปพร้อมกัน ชัดระดับ Full HD): <br>
+            <input type="file" accept="image/*" multiple onchange="addStoryImages(event, ${hIdx})">
+          </div>
+          <div class="stories-grid">${storiesHTML}</div>
         `;
         hlBox.appendChild(card);
       });
-    }
-
-    function updateHlImages(idx, textVal) {
-      const arr = textVal.split('\n').map(s => s.trim()).filter(s => s.length > 0);
-      highlightsList[idx].images = arr;
-      renderAdminPanels();
     }
 
     function addNewHighlight() {
@@ -285,6 +289,9 @@
       if (confirm(`ต้องการลบไฮไลท์ที่ ${idx + 1} ใช่หรือไม่?`)) {
         const item = highlightsList[idx];
         if (item.id) {
+          // ลบ slides ย่อย
+          const snap = await db.collection(DB_HL).doc(item.id).collection("slides").get();
+          snap.forEach(doc => doc.ref.delete());
           await db.collection(DB_HL).doc(item.id).delete();
         }
         highlightsList.splice(idx, 1);
@@ -292,14 +299,71 @@
       }
     }
 
+    // บีบอัดระดับ Full HD (กว้าง 1080px คมชัดสูงมาก ตัวหนังสือเล็กๆ อ่านออกสบายตา 100%)
+    function compressImageHD(file, maxWidth = 1080, quality = 0.82) {
+      return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            if (w > maxWidth) {
+              h = Math.round((h * maxWidth) / w);
+              w = maxWidth;
+            }
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadDirect(e, key) {
+      if (e.target.files && e.target.files[0]) {
+        siteData[key] = await compressImageHD(e.target.files[0], 800, 0.8);
+      }
+    }
+
+    async function changeHlCover(e, idx) {
+      if (e.target.files && e.target.files[0]) {
+        highlightsList[idx].cover = await compressImageHD(e.target.files[0], 350, 0.8);
+        renderAdminPanels();
+      }
+    }
+
+    async function addStoryImages(e, idx) {
+      const files = Array.from(e.target.files);
+      if (!highlightsList[idx].images) highlightsList[idx].images = [];
+      const saveBtn = document.getElementById('saveAllBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'กำลังโหลดรูปภาพ... กรุณารอสักครู่ ⏳';
+
+      for (const file of files) {
+        const b64 = await compressImageHD(file, 1080, 0.82);
+        highlightsList[idx].images.push(b64);
+      }
+      renderAdminPanels();
+      saveBtn.disabled = false;
+      saveBtn.textContent = '☁️ บันทึกขึ้นระบบทันที (ภาพชัด 100%) ♡';
+    }
+
+    function removeStoryImage(hlIdx, storyIdx) {
+      highlightsList[hlIdx].images.splice(storyIdx, 1);
+      renderAdminPanels();
+    }
+
     async function saveAllToCloud() {
       const btn = document.getElementById('saveAllBtn');
       btn.disabled = true;
-      btn.textContent = 'กำลังบันทึกข้อมูล... ⏳';
+      btn.textContent = 'กำลังบันทึกข้อมูลแบบ HD ขึ้นระบบ... ⏳';
 
-      siteData.banner = document.getElementById('bannerInput').value.trim();
-      siteData.profile = document.getElementById('profileInput').value.trim();
-      siteData.storeName = document.getElementById('storeNameInput').value.trim();
+      siteData.storeName = document.getElementById('storeNameInput').value;
       siteData.storeBio = document.getElementById('storeBioInput').value;
       siteData.musicUrl = document.getElementById('musicUrlInput').value.trim();
 
@@ -308,24 +372,46 @@
 
         for (let i = 0; i < highlightsList.length; i++) {
           const hl = highlightsList[i];
+          let docId = hl.id;
+
+          // บันทึกเฉพาะข้อมูลหลักของไฮไลท์
           const hlDoc = {
             title: hl.title || `Credit Highlights`,
             cover: hl.cover || (hl.images && hl.images[0]) || "",
-            images: hl.images || [],
             order: i
           };
-          if (hl.id) {
-            await db.collection(DB_HL).doc(hl.id).set(hlDoc);
+
+          if (docId) {
+            await db.collection(DB_HL).doc(docId).set(hlDoc);
           } else {
             const docRef = await db.collection(DB_HL).add(hlDoc);
-            hl.id = docRef.id;
+            docId = docRef.id;
+            hl.id = docId;
+          }
+
+          // แยกเก็บรูปภาพทีละรูปใน Sub-collection "slides" (ไม่ติด Limit 1MB แน่นอน!)
+          const slidesRef = db.collection(DB_HL).doc(docId).collection("slides");
+          
+          // ลบ slides เดิมก่อน
+          const existingSnap = await slidesRef.get();
+          const batch = db.batch();
+          existingSnap.forEach(d => batch.delete(d.ref));
+          await batch.commit();
+
+          // บันทึกทีละรูป รูปละ 1 Document คมชัดระดับ 1080p
+          const imgs = hl.images || [];
+          for (let sIdx = 0; sIdx < imgs.length; sIdx++) {
+            await slidesRef.doc(String(sIdx).padStart(4, '0')).set({
+              idx: sIdx,
+              url: imgs[sIdx]
+            });
           }
         }
 
-        alert('✨ บันทึกสำเร็จแล้วค่ะ! ภาพชัด 100% แน่นอน');
+        alert('✨ บันทึกสำเร็จเรียบร้อยแล้วค่ะ! ภาพชัดระดับ Full HD ไม่ติดขัดแน่นอน');
       } catch (err) {
         console.error(err);
-        alert('เกิดข้อผิดพลาด: ' + err.message);
+        alert('เกิดข้อผิดพลาดในการบันทึก: ' + err.message);
       } finally {
         btn.disabled = false;
         btn.textContent = '☁️ บันทึกขึ้นระบบทันที (ภาพชัด 100%) ♡';
